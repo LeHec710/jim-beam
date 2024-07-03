@@ -1,0 +1,56 @@
+{% extends 'front/base.html.twig' %}
+{% set currentPage = 'result' %}
+{% block body %}
+
+<div class="container-fluid flex-grow-1 flex-center animate__animated animate__fadeIn delay-3">
+    <div class="container text-center">
+        <div class="row ">
+            <div class="col mb-3"> 
+                <h1 class="text-uppercase text-center text-light">{{ product is null ? "dommage..." : "felicitations !" }}</h1>
+            </div>
+        </div>
+        <div class="row {{product ? "mt-5" : ""}}">
+            <div class="col">
+                <div class="flex-center bg-light p-5 text-dark text-uppercase fs-5 mb-3 position-relative" style="border-radius: 10px">
+                    {% if product %}
+                        <div class="position-absolute top-0 start-50 translate-middle text-dark">
+                            <img height="90" src="{{ asset('uploads/' ~ product.picture )}}" class="mb-3" />
+                        </div>
+                        <div class="d-flex flex-column">
+                            <h3>Vous avez gagne !</h3>
+                            <h3>{{product.name}}</h3>
+                            
+                            {{product.name}} 
+                            {% if product.description %}                                
+                                <p>{{product.description}}</p>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        {{ product ? product.name : "Dommage, vous n'avez pas gagne cette fois-ci." }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    <div class="row mt-4">
+        <div class="col text-end text-dark text-uppercase">
+            <h4>
+                {% if product is null %}
+                    Tout n'est pas perdu, <br />
+                {% endif %}
+                rendez-vous le XX octobre <br />
+                pour le tirage au sort <br />
+                du week-end !
+            </h4>
+        </div>
+    </div>
+
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block javascripts %}
+{{ parent()}}
+{% endblock %}

@@ -1,0 +1,78 @@
+
+{% apply spaceless %}
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Primary Meta Tags -->
+  <title>Socle</title>
+  <meta name="title" content="Socle" />
+  <meta name="description" content="Socle" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://limeo.com" />
+  <meta property="og:title" content="Socle" />
+  <meta property="og:description" content="Socle" />
+  <meta property="og:image" content="https://metatags.io/images/meta-tags.png" />
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:url" content="https://limeo.com" />
+  <meta property="twitter:title" content="Socle" />
+  <meta property="twitter:description" content="Socle" />
+  <meta property="twitter:image" content="https://metatags.io/images/meta-tags.png" />
+
+
+  <link rel="icon" type="image/png" href="{{ asset('assets/favicon/favicon-32x32.png') }}" sizes="32x32">
+  <link rel="icon" type="image/png" href="{{ asset('assets/favicon/favicon-32x32.png') }}" sizes="32x32">
+  <link rel="apple-touch-icon" href="{{ asset('assets/favicon/favicon-32x32.png') }}">
+
+  <script src="{{ asset('assets/') }}vendor/jquery/dist/jquery.min.js"></script>
+  <script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+  {% set lottery = lotteryService.getLottery() %}
+  <script>
+    const route = "{{app.request.get('_route')}}"
+
+    const isMajor = localStorage.getItem("major") == "true"
+    if(route !== "front_legals" && !isMajor) {
+      window.location.href = "{{ path('front_legals')}}"
+    }
+
+    const hasPlayed = Boolean("{{ lotteryService.hasPlayed() }}")
+    if(hasPlayed && route !== "front_result") {
+      window.location.href = "{{ path('front_result')}}"
+    }
+  </script>
+  
+  {% block stylesheets %}{% endblock %}
+  {{ encore_entry_link_tags('app') }}
+</head>
+
+<body class="overflow-hidden min-vh-100">
+  {% include "front/components/header.html.twig" %}
+
+  <div class="h-100 d-flex flex-column flex-grow-1 mb-5" style="z-index: 5">
+  {% block body %}{% endblock %}
+  </div>
+
+
+  <img src="{{ asset('assets/img/bottle_shadow.png') }}" class="bottle_shadow col-8 col-md-6 position-absolute bottom-0 end-0 " style="mix-blend-mode: multiply;" alt="">
+  <img src="{{ asset('assets/img/bottle.png') }}" class="bottle col-8 col-md-6 position-absolute bottom-0 end-0 " style="opacity: .8;" alt="">
+
+  {% include "front/components/footer.html.twig" %}
+
+  {% block javascripts %}
+  {% endblock %}
+
+  {{ encore_entry_script_tags('app') }}
+
+</body>
+
+</html>
+
+{% endapply %}

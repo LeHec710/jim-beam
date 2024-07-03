@@ -1,0 +1,13 @@
+{% if step is not defined %}
+    {% set step = 1 %}
+{% endif %}
+
+<div class="container-fluid flex-center mt-3 ">
+    <div class="container text-center" style="max-width: 1000px">
+        <div class="row">
+            <div class="col"> 
+                <span class="text-dark text-center fs-4">{{step ~ "/" ~ maxStep}}</span>
+            </div>
+        </div>
+    </div>
+</div>

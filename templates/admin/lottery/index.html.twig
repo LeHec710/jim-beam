@@ -1,0 +1,64 @@
+{% extends 'admin/base.html.twig' %}
+
+{% set menu = 'lottery' %}
+
+{% set page_name = 'Liste des tirages' %}
+
+{% set breadcrumbs = [
+        {"title": "Tirages au sort", 'url' : ""},
+        {"title": page_name, 'url' : ""},
+] %}
+
+{% block body %}
+    <div class="card shadow">
+
+      <div class="card-header border-0">
+          <div class='row align-items-center'>
+              <div class="col">
+                  <h3 class="mb-0">{{page_name}}</h3>
+              </div>
+
+            <a class="btn addItem btn-success"><i class="fas fa-plus mr-2"></i> Créer un tirage</a>
+          </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table align-items-center table-flush dataTable" id="dt_default">
+              <thead class="thead-light">
+
+                <tr>
+                    <th class="sorting">Nom</th>
+                    <th class="sorting">Début le</th>
+                    <th class="sorting">Tirage le</th>
+                    <th class="sorting">Participants</th>
+                    <th style="width:150px;">Actions</th>
+                </tr>
+            </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+ </div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent()}}
+    <script>
+        var tableUrl = "{{ path('lottery_datas')}}";
+        var tableSortingDefault = [[0, "asc" ]];
+        var tableNotOrderable = [ 4]; 
+        
+        var APP_FORM_URL = "{{path('lottery_form')}}";
+
+        function generateIG(id) {
+          $.get(
+            './generate/'+id,
+            {},
+            function(res) {
+              console.log(res);
+              $('.igCount').html(res.success);
+            }
+          )
+        }
+    </script>
+    {% include 'admin/components/js_datatable.html.twig' %}
+{% endblock %}

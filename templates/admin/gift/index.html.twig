@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gift index{% endblock %}
+
+{% block body %}
+    <h1>Gift index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Instant_at</th>
+                <th>Win_at</th>
+                <th>Is_delivered</th>
+                <th>Delivered_at</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for gift in gifts %}
+            <tr>
+                <td>{{ gift.id }}</td>
+                <td>{{ gift.name }}</td>
+                <td>{{ gift.instantAt ? gift.instantAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ gift.winAt ? gift.winAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ gift.isDelivered ? 'Yes' : 'No' }}</td>
+                <td>{{ gift.deliveredAt ? gift.deliveredAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('gift_show', {'id': gift.id}) }}">show</a>
+                    <a href="{{ path('gift_edit', {'id': gift.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="7">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    
+
+    <a href="{{ path('gift_new') }}">Create new</a>
+{% endblock %}

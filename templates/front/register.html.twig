@@ -1,0 +1,94 @@
+{% extends 'front/base.html.twig' %}
+{% set currentPage = 'front_register' %}
+{% block body %}
+
+<div class="container-fluid flex-grow-1 flex-center animate__animated animate__fadeIn delay-3">
+    <div class="container form">
+        <div class="row">
+
+
+            <div class="col-12  ">
+                <div class="text-uppercase text-center">
+                <h2 class="text-light fs-4 mb-4 mb-lg-5">Pour decouvrir immediatement si vous avez gagne une carte cadeau, <br />veuillez remplir le formulaire ci-dessous :</h2>
+                </div>
+                <form id="register" action="{{ path('front_submit') }}" class="row needs-validation" method="POST" novalidate >
+                    <div class="col-xl-6 px-4 ps-md-4">
+                        <div class="row">
+                            <div class="col-12 mb-2 px-0">
+                                <div class="form-group">
+                                    <input maxlength="60" pattern="^[ a-zA-ZÀ-ÿ\-\u00f1\u00d1]*$" name="lastname" placeholder="Nom *" type="text" class="form-control custom-input" required="true">
+                                    <div class="invalid-feedback text-uppercase">
+                                        Veuillez saisir votre nom
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 mb-2 px-0">
+                                <div class="form-group">
+                                    <input maxlength="60" pattern="^[ a-zA-ZÀ-ÿ\-\u00f1\u00d1]*$" name="firstname" placeholder="Prenom *" type="text" class="form-control custom-input" required="true">
+                                    <div class="invalid-feedback text-uppercase">
+                                        Veuillez saisir votre prénom
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 mb-2 px-0">
+                                <div class="form-group">
+                                    <input pattern="[^@]+@[^@]+\.[a-zA-Z]{2,6}" name="email" placeholder="Adresse e-mail *" type="text" class="form-control custom-input" required="true">
+                                    <div class="invalid-feedback text-uppercase">
+                                        Veuillez saisir votre adresse e-mail
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 mb-2 px-0">
+                                <div class="form-group">
+                                    <input pattern="^((\+)33|0)[1-9](\d{2}){4}$" name="phone" placeholder="Telephone *" type="text" class="form-control custom-input" required="true">
+                                    <div class="invalid-feedback text-uppercase">
+                                        Veuillez saisir votre numéro de téléphone
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-6 px-lg-5 pt-lg-0 pt-3 mt-3">
+                        <span class="text-center fw-bold text-dark">Ce formulaire vous permet egalement de participer a notre tirage au sort pour remporter le week-end pour 2 personnes. </span>
+                        <div id="error" class="invalid-feedback text-uppercase animate__animated animate__zoomIn fs-3 mt-2"></div>
+                    </div>
+                    <div class="col-xl-6 px-lg-5 pt-lg-0 pt-3 mt-lg-4">
+                        <button type="submit" class="btn btn-primary custom-btn-primary w-100 next" >Envoyer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block javascripts %}
+{{ parent()}}
+<script>
+
+$("#register").on("submit", function() {
+    if($(this)[0].checkValidity()) {
+        const form = $(this)[0]
+        var data = new FormData(form);
+        console.log(data);
+        $.ajax({
+            url: 'submit',
+            method: 'POST',
+            data: data,
+            processData: false,
+            contentType: false,
+            success: function (res) {
+                if (res.success == true) {
+                    window.location.href = "{{ path('front_result') }}";
+                }
+                if (res.error) {
+                    $('#error').html(res.error).show();
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,250 @@
+<script src="{{ asset('assets/') }}vendor/datatables.net/js/jquery.dataTables.min.js"></script>
+<script src="{{ asset('assets/') }}vendor/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+<script src="{{ asset('assets/') }}vendor/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+<script src="{{ asset('assets/') }}vendor/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"></script>
+<script src="{{ asset('assets/') }}vendor/datatables.net-buttons/js/buttons.html5.min.js"></script>
+<script src="{{ asset('assets/') }}vendor/datatables.net-buttons/js/buttons.flash.min.js"></script>
+<script src="{{ asset('assets/') }}vendor/datatables.net-buttons/js/buttons.print.min.js"></script>
+<script src="{{ asset('assets/') }}vendor/datatables.net-select/js/dataTables.select.min.js"></script>
+
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+            </div>
+          </div>
+        </div>
+
+<script>
+    $(document).ready(function(){
+
+        $('.addItem').on('click',function() {
+            openForm()
+        });
+
+        var dataTable = $("#dt_default").DataTable({
+            "aLengthMenu": [
+                [ 50, 100, 150],
+                [ 50, 100, 150] // change per page values here
+            ],
+           responsive: true,
+                "iDisplayLength": 50, // default record count per page
+                "bServerSide": true, // server side processing
+                "sDom": '<"top"l>rt<"bottom"p><"clear">',// cacher le champ de recherche
+                "sAjaxSource": tableUrl, // ajax source
+                "aaSorting": tableSortingDefault, // set first column as a default sort by asc
+                "columnDefs": [ {
+                        "targets": tableNotOrderable,
+                        "orderable": false
+                }],
+                "language": {
+                    "url": "{{ asset('assets/vendor/datatables.net/fr.json') }}"
+                }
+            });
+        
+        $("#dt_default").on('xhr.dt', function ( e, settings, json, xhr ) {
+          setTimeout(function() {
+              $('[data-toggle="tooltip"]').tooltip();
+
+          },500)
+        });
+
+        $( "body" ).on( "click", ".editItem", function() {
+            var itemId = $(this).attr('data-id');
+            var url = $(this).attr('data-url');
+            if (url != null) {
+                openForm(null, url);
+            } else {
+                openForm(itemId);
+            }
+        });
+
+        $('#confirmDeleteBox').on('hidden.bs.modal', function (e) {
+                $('#confirmDeleteBox').find('.modal-body').html('');
+                $('#confirmDeleteBox').find('#confirmBoxToken').val('');
+                $('#confirmDeleteBox').find('#form-delete').attr('action', "#");
+            });  
+
+        $( "body" ).on( "click",".confirmDeleteBox",  function() {
+                $('#editModal').modal('hide');
+                $('.modal-backdrop').remove();
+                var message = $(this).data('message');
+                var token = $(this).data('token');
+                var url = $(this).data('url');
+                var form = $('#confirmDeleteBox').find('#form-delete');
+
+                $('#confirmDeleteBox').find('.modal-body').html(message);
+                $('#confirmDeleteBox').find('#confirmBoxToken').val(token);
+                form.attr('action', url);
+                form.on('submit', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    $.ajax({
+                        method : 'DELETE',
+                        url : url,
+                        data : $('#form-delete').serialize(),
+                        success : function() {
+                            dataTable.ajax.reload();
+                            $('#confirmDeleteBox').modal('hide');
+                        }
+
+                    })
+                });
+                $('#confirmDeleteBox').modal('show');
+            });
+
+                   
+        
+        function fnFilterColumn(i) {
+            $('#dt_default').dataTable().fnFilter(
+                $("#col"+i+"_filter").val(),
+                i
+            );
+        }
+
+        $('.table-filter').keyup( function() {
+            var i = $(this).data('filter');
+            fnFilterColumn(i);
+        });
+
+        $('.table-filter').change( function() {
+            var i = $(this).data('filter');
+            fnFilterColumn(i);
+        });
+
+        function openForm(itemId = null, url = null) {
+            $('.modal-backdrop').remove();
+            $('#editModal').modal('hide');
+            var itemURL = itemId != null ? '/'+itemId : '';
+            var formURL = url != null ? url : (APP_FORM_URL + itemURL);
+            $.get(
+                formURL,
+                    {}, function (form) {
+                        var content = $('#editModal .modal-content');
+                        content.html(form);
+
+                        $('select[multiple]').select2({
+                            placeholer : 'Veuillez sélectionner un élement',
+                            dropdownAutoWidth: true,
+                            multiple: true,
+                        });
+
+                        $('[data-toggle="tooltip"]').tooltip();
+
+                        $('.datepickerFr').datepicker({
+                            format: 'dd/mm/yyyy',
+                            language: 'fr',
+                            forceParse: false
+                        });
+
+                        $('.datetimepicker').datetimepicker({
+                          locale: 'fr',
+                          format: 'DD/MM/YYYY HH:mm',
+                          icons: {
+                            time: "fa fa-clock",
+                            date: "fa fa-calendar",
+                            up: "fa fa-chevron-up",
+                            down: "fa fa-chevron-down",
+                            previous: 'fa fa-chevron-left',
+                            next: 'fa fa-chevron-right',
+                            today: 'fa fa-screenshot',
+                            clear: 'fa fa-trash',
+                            close: 'fa fa-remove'
+                          }
+                        });
+
+                        $( '.inputfile' ).each( function()
+                        {
+                            var $input	 = $( this ),
+                                $label	 = $input.next( 'label' ),
+                                labelVal = $label.html();
+
+                            $input.on( 'change', function( e )
+                            {
+                                var fileName = '';
+
+                                if( this.files && this.files.length > 1 )
+                                    fileName = ( this.getAttribute( 'data-multiple-caption' ) || '' ).replace( '{count}', this.files.length );
+                                else if( e.target.value )
+                                    fileName = e.target.value.split( '\\' ).pop();
+
+                                if( fileName )
+                                    $label.find( 'span' ).html( fileName );
+                                else
+                                    $label.html( labelVal );
+                            });
+
+                            // Firefox bug fix
+                            $input
+                            .on( 'focus', function(){ $input.addClass( 'has-focus' ); })
+                            .on( 'blur', function(){ $input.removeClass( 'has-focus' ); });
+                        });
+
+                        $('.closeModal').on('click', function() {
+                        $('#editModal').modal('hide');
+                        });
+
+
+                        var editForm = $('#editModal form');
+                        editForm.on('submit', function(e) {
+                             e.preventDefault();
+                             e.stopPropagation();
+                             if (editForm[0].checkValidity() === false) {
+                                 
+                            } else {
+                                
+                                var formData = new FormData(editForm[0]);
+                                if ($('#lottery_picture').length) {
+                                    var file = $('#lottery_picture')[0].files[0];
+                                    if (file != undefined) {
+                                        formData.append("lottery[picture]", file, file.name);
+                                    }
+                                }
+                                
+                               $.ajax({
+                                url : formURL,
+                                data : formData,
+                                method : 'POST',
+                                contentType: false,
+                                processData: false,
+                                success : function(res) {
+                                    var data = JSON.parse(res);
+                                    console.log(data);
+                                    if (data.success) {
+                                        var txt = itemId != null ? "La modification a bien été effectuée" : "L'ajout a été effectué";
+                                        if (itemId == null) {
+                                            openForm(data.id, null);
+                                        } else {
+                                            openForm(itemId, null);
+                                        }
+                                        $.notify({
+                                        	message: txt,
+                                            icon: 'fas fa-check mr-2',
+                                        },{
+                                        	type: 'success'
+                                        });
+                                        dataTable.ajax.reload();
+                                    }
+                                    if (data.error) {
+                                        $.notify({
+                                        	message: data.error,
+                                            icon: 'fas fa-close mr-2',
+                                        },{
+                                        	type: 'danger'
+                                        });
+                                    }
+                                 }
+                               });
+                           }
+                           editForm.addClass('was-validated');
+                        })
+                        setTimeout(() => {
+                            $('#editModal').modal('show');
+                        }, 500);
+                    }
+                )         
+        }
+        
+        
+
+    });
+</script>

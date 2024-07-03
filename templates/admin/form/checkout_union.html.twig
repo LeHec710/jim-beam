@@ -1,0 +1,124 @@
+{% extends 'base.html.twig' %}
+
+    {% set breadcrumbs = [
+            {"title": page_name, 'url' : ""},
+    ] %}
+
+{% block body %}
+
+    <div class="card p-5 text-center shadow">
+      <h2>
+        <i class="fa fa-credit-card mr-2"></i>
+        Paiement de votre cotisation <b>par CB</b></h2>
+        <h1>{{ cotisation }}</h1>
+      <hr>
+      <table style="max-width:400px;" class="table table-striped text-left m-auto">
+        <tr>
+          <td>Total HT</td>
+          <td class="text-right"><b>{{ ht|number_format(2, ',') }}€</b></td>
+        </tr>
+        <tr>
+          <td>Frais de gestion</td>
+          <td class="text-right"><b>{{ fee|number_format(2, ',') }}€</b></td>
+        </tr>
+        <tr>
+          <td>Total TTC</td>
+          <td class="text-right"><b>{{ ttc|number_format(2, ',') }}€</b></td>
+        </tr>
+      </table>
+
+      <h1 class="pt-5">Montant à payer : <b>{{ ttc|number_format(2, ',') }}€</b></h1>
+      <p>Veuillez saisir les informations suivantes pour finaliser votre paiement :</p>
+
+      <form method="post" id="payment-form" action="{{ path('cotisation_union_payment_confirmation', { cotisation : cotisation }) }}">
+        <div style="max-width:500px" class="form-control mx-auto" id="card-element"></div>
+        <div id="card-errors" role="alert"></div>
+        <input type="hidden" name="paymentIntent" value="{{intent.id}}">
+
+        <button class="btn btn-icon btn-primary mt-3" id="card-button" data-secret="{{intent.client_secret}}" type="submit">
+            <span class="btn-inner--icon"><i class="fas fa-shopping-cart"></i></span>
+            <span class="btn-inner--text">Confirmer le paiement</span>
+        </button>
+      </form>
+      <hr>
+      <p class="text-left">
+        <b><i class="fa fa-lock mr-2"></i>Paiement sécurisé : </b><br>
+Vos coordonnées bancaires sont cryptées et transmises directement via une connexion sécurisée à Stripe.
+<br>
+Soroptimist vous garantit un achat sans risque et en toute confiance.
+<br>
+Stripe utilise la technologie SSL (cryptage en 128 bits) pour garantir une transaction sécurisée lors d'un paiement par carte bancaire.
+<br><br>
+<b><i class="fa fa-shield-alt mr-2"></i>Une garantie de confidentialité :</b><br>
+Soroptimist n'a, à aucun moment, accès à vos coordonnées bancaires. Stripe agit en tant que tiers de confiance pour réaliser la transaction.
+
+</p>
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+{{ parent()}}
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+var env = 'dev';
+var API = {
+  'dev' : 'pk_test_51H5rIKEP53qF8MPMxQpi6a7xyNGyRH6YqzYQrBvjW3klBMdgitKSscpa5LGDtIdZucuCIGolqPW7r9hIn0ZTE0bR00nnxUggWb',
+  'prod' : ''
+}
+var stripe = Stripe(API[env]);
+var elements = stripe.elements();
+
+var style = {
+  base: {
+    color: "#32325d",
+  }
+};
+
+var card = elements.create("card", { style: style });
+card.mount("#card-element");
+var cardButton = document.getElementById('card-button');
+var clientSecret = cardButton.dataset.secret;
+
+card.on('change', function(event) {
+  var displayError = document.getElementById('card-errors');
+  if (event.error) {
+    displayError.textContent = event.error.message;
+  } else {
+    displayError.textContent = '';
+  }
+});
+
+var form = document.getElementById('payment-form');
+
+form.addEventListener('submit', function(ev) {
+  ev.preventDefault();
+  stripe.confirmCardPayment(clientSecret, {
+    payment_method: {
+      card: card,
+      billing_details: {
+        name: '{{ app.user.firstname }} {{ app.user.lastname }}',
+        email: '{{ app.user.email }}',
+        address : {
+          city : '{{ app.user.city }}',
+          country : 'FR',
+          line1 : '{{ app.user.address }}',
+          postal_code : '{{ app.user.zip }}',
+        }
+      }
+    }
+  }).then(function(result) {
+    if (result.error) {
+
+      $('#card-errors')
+      .html(result.error.message)
+      .show();
+    } else {
+      if (result.paymentIntent.status === 'succeeded') {
+        $('#payment-form').submit();
+      }
+    }
+  });
+});
+</script>
+{% endblock %}

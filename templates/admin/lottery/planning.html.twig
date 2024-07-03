@@ -1,0 +1,157 @@
+{% extends 'admin/base.html.twig' %}
+
+{% set menu = 'lottery' %}
+
+{% set page_name = 'Planning' %}
+
+{% set breadcrumbs = [
+        {"title": "Instant gagnants", 'url' : path('lottery_index')},
+        {"title": lottery.name, 'url' : path('lottery_index') },
+        {"title": page_name, 'url' : ""},
+] %}
+
+{% block body %}
+    <div class="card card-calendar shadow">
+            <!-- Card header -->
+            <div class="card-header">
+              <!-- Title -->
+              <h5 class="h3 mb-0">Planning des instants gagnants</h5>
+            </div>
+            <!-- Card body -->
+            <div class="card-body p-0">
+              <div class="calendar" id="fullCalendar"></div>
+            </div>
+          </div>
+
+		  <div class="modal fade" id="new-event" tabindex="-1" role="dialog" aria-labelledby="new-event-label" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-secondary" role="document">
+              <div class="modal-content">
+                <!-- Modal body -->
+                <div class="modal-body">
+                </div>
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                  <button type="submit" class="btn btn-primary new-event--add">Add event</button>
+                  <button type="button" class="btn btn-link ml-auto" data-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+		  
+{% endblock %}
+
+{% block javascripts %}
+{{ parent()}}
+<script src='{{ asset('assets/plugins/fullcalendar/moment.min.js') }}'></script>
+<script src='{{ asset('assets/plugins/fullcalendar/fullcalendar.min.js') }}'></script>
+<script src='{{ asset('assets/plugins/fullcalendar/fr.js') }}'></script>
+
+<script>
+
+  function getHeight() {
+    var height = $(document).height() - 250;
+    return height;
+  }
+  const id = '{{lottery.id}}';
+  let events = [];
+  let start = "{{ lottery.startAt|date('Y-m-d') }}";
+  let end = "{{ lottery.endAt|date('Y-m-d') }}";
+
+  const initCalendar = () => {
+    $('#fullCalendar').fullCalendar({
+      lang: 'fr',
+      height: getHeight(),
+      header: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'month,agendaWeek,agendaDay,listMonth'
+      },
+      navLinks: true, // can click day/week names to navigate views
+      aspectRatio: 2.1,
+      defaultDate: moment(),
+      selectable: true,
+      selectHelper: true,
+      eventLimit: true,
+      disableDragging:true,
+      editable:true,
+      timeFormat: 'HH:mm',
+	  defaultTimedEventDuration : '00:20',
+	  slotDuration: '00:20',
+      events: events,
+	  dayRender: function(date, cell){
+        if (moment().diff(date,'days') > 0){
+            cell
+			.css("border-color","#ccc")
+			.css("background-color","#f5f5f5");
+        }
+		if (moment(start).diff(date,'days') == 0){
+            cell
+			.css("border-left","solid 5px red");
+        }
+		if (moment(start).diff(date,'days') > 0){
+            cell
+			.css("background-color","#d1d9dd");
+        }
+		if (moment(end).diff(date,'days') == 0){
+            cell
+			.css("border-right","solid 5px red");
+        }
+		if (moment(end).diff(date,'days') < 0){
+            cell
+			.css("background-color","#d1d9dd");
+        }
+   	 },
+	minTime : '09:00:00',
+	maxTime : '21:00:00',
+      eventClick: function(event, jsEvent, view) {
+        
+      },
+      eventDrop: function(event, delta, revertFunc) {
+        if (!confirm("Souhaitez-vous confirmer cette modification ?")) {
+          revertFunc();
+        } else {
+            $.ajax({
+              url: "{{ path('lottery_update_event')}}",
+              type : 'POST',
+              data : {
+                start :event.start.format('YYYY-MM-DD HH:mm:ss'), 
+                eventId: event.id,
+                lotteryId : {{ lottery.id }}
+              }
+            }).done(function(result) {
+
+              if(result.error) {
+                  revertFunc();
+                  UIkit.modal.alert('<h3 class="heading_b uk-margin-medium-bottom">Erreur</h3><div class="uk-margin-medium-bottom">'+result.error+'</div>');
+              } 
+            });
+        }
+      },
+    });
+  }
+
+  const getEvents = () => {
+    $.ajax({
+            method: "GET",
+            url: "?events=true",
+            format: "json",
+        })
+        .done(function( result ) {
+          events = JSON.parse(result);
+          initCalendar();
+        });
+  }
+
+  getEvents();
+
+ 
+
+$( window ).resize(function() {
+  $('#ifcalendar').fullCalendar('option', 'height', getHeight());
+});
+
+</script>
+
+{% endblock %}

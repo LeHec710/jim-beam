@@ -1,0 +1,74 @@
+
+{% if form.vars.value.id is not null %}
+    {% set page_name = 'Modification du produit  '~form.vars.value.name %}
+{% else %}
+    {% set page_name = 'Nouveau produit' %}
+{% endif %}
+
+
+{{ form_start(form, {'attr': {'novalidate': 'novalidate','class': 'needs-validation', 'autocomplete': 'off'}}) }}
+
+    <div class="card bg-secondary shadow">
+
+        <div class="card-header border-0">
+            <div class='row align-items-center'>
+                <div class="col">
+                    <h3 class="mb-0">{{page_name}}</h3>
+                </div>
+                    <div class="col text-right">
+                              <button class="btn btn-icon btn-success" type='submit' data-toggle="tooltip" data-animation="false" title="" data-original-title="Enregistrer le formulaire">
+                                <i class="fa fa-save mr-2"></i>
+                                Enregistrer
+                            </button>
+
+                        {% if form.vars.value.id is not null %}
+
+                              <a href="javascript:void(0);" class="btn btn-danger confirmDeleteBox" data-message="Souhaitez-vous supprimer définitivement cet utilisateur ?<br/> Toutes les données rattachées à cet utilisateur seront automatiquement supprimées." data-token="{{ csrf_token('delete'~form.vars.value.id) }}" data-url="{{ path('product_delete', {'id': form.vars.value.id}) }}" >
+                                  <i class="fa fa-trash mr-2"></i> 
+                                  Supprimer
+                             </a>
+                        {% endif %}
+                    </div>
+            </div>
+        </div>
+
+      <div class="card-body">
+        <h6 class="heading-small text-muted mb-4">Informations générales</h6>
+        
+         <div class="row">
+            <div class="col-lg-6">
+                  {{ form_widget(form.name) }}
+            </div>
+            <div class="col-lg-6">
+                  {{ form_widget(form.price) }}
+            </div>
+            <div class="col-lg-6">
+                  {{ form_widget(form.quantity) }}
+            </div>
+            <div class="col-lg-6">
+                <label for="" class="form-control-label">Image du produit</label>
+                  {{ form_widget(form.picture) }}
+                  {% if form.vars.value.picture %}
+                <img class="card m-0" height="100" src="{{ asset('uploads/' ~ form.vars.value.picture ) }}" alt="">
+                  {% endif %}
+            </div>
+        </div>
+
+      </div>
+
+      <div class="card-footer">
+          <button class="btn btn-icon btn-success" type='submit' >
+                <i class="fa fa-save mr-2"></i>
+                <span class="btn-inner--text">Enregistrer</span>
+            </button>
+
+          <a class="btn btn-icon editItem" data-url="{{ path('lottery_form', { id : lottery.id } ) }}" data-dismiss="modal">
+                <i class="fa fa-arrow-left mr-2"></i>
+                <span class="btn-inner--text">Retour</span>
+            </a>
+
+      </div>
+
+    </div>
+
+    {{ form_end(form) }}

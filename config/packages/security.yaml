@@ -1,0 +1,48 @@
+security:
+
+    enable_authenticator_manager: true
+
+    role_hierarchy:
+        ROLE_ADMIN: [ROLE_ADMIN]
+        ROLE_ALLOWED_TO_SWITCH: [ROLE_ALLOWED_TO_SWITCH]
+        ROLE_MANAGER: [ROLE_MANAGER]
+        ROLE_CUSTOMER: [ROLE_CUSTOMER]
+        ROLE_USER: [ROLE_USER]
+    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+    # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
+    providers:
+        users_in_memory: { memory: null }
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: email
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        main:
+            lazy: true
+            provider: app_user_provider
+            #custom_authenticators:
+            #        - App\Security\LoginFormAuthenticator
+            logout:
+                path: app_logout
+            switch_user: true
+            form_login:
+                enable_csrf: true
+                login_path: app_login
+                check_path: app_login
+
+    # Easy way to control access for large sections of your site
+    # Note: Only the *first* access control that matches will be used
+    access_control:
+        - { path: ^/admin/connexion, roles: PUBLIC_ACCESS }
+        - { path: ^/resetting, roles: PUBLIC_ACCESS }
+        - { path: ^/mot-de-passe-perdu, roles: PUBLIC_ACCESS }
+        - { path: ^/mise-a-jour-mot-de-passe, roles: PUBLIC_ACCESS }
+        # - { path: ^/, roles: PUBLIC_ACCESS }
+        - { path: ^/admin, roles: ['ROLE_ADMIN', 'ROLE_MANAGER'] }
+        - { path: ^/admin/*, roles: ['ROLE_ADMIN', 'ROLE_MANAGER'] }
+        # - { path: ^/profile, roles: ROLE_USER }

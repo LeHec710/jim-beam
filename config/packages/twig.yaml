@@ -1,0 +1,23 @@
+twig:
+    default_path: '%kernel.project_dir%/templates'
+    debug: '%kernel.debug%'
+    strict_variables: '%kernel.debug%'
+    exception_controller: null
+    form_themes: ['admin/form/default.html.twig']
+    globals:
+        mailer_copyright: '%env(MAILER_COPYRIGHT)%'
+        recaptcha_public: '%env(RECAPTCHA_PUBLIC)%'
+        recaptcha_secret: '%env(RECAPTCHA_SECRET)%'
+
+        project_type: '%env(PROJECT_TYPE)%'
+        project_name: '%env(PROJECT_NAME)%'
+        project_url: '%env(PROJECT_URL)%'
+        project_customer: '%env(PROJECT_CUSTOMER)%'
+        project_copyright: '%env(PROJECT_COPYRIGHT)%'
+
+        project_color_primary: '%env(PROJECT_COLOR_PRIMARY)%'
+        project_color_secondary: '%env(PROJECT_COLOR_SECONDARY)%'
+
+        project_absolute_url: '%env(PROJECT_ABSOLUTE_URL)%'
+
+        lotteryService: '@App\Service\App'

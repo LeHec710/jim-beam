@@ -1,0 +1,142 @@
+{% extends 'admin/base.html.twig' %}
+
+{% set menu = 'gains' %}
+
+{% set page_name = 'Gestion des gains' %}
+
+{% set breadcrumbs = [
+        {"title": "Instant gagnants", 'url' : ""},
+        {"title": page_name, 'url' : ""},
+] %}
+
+{% block body %}
+    <div class="card shadow">
+
+      <div class="card-header border-0">
+          <div class='row align-items-center'>
+              <div class="col">
+                  <h3 class="mb-0">{{page_name}}</h3>
+              </div>
+			   <a href="" class="btn btn-success"><i class="fas fa-refresh mr-2"></i> Rafraîchir</a>
+          </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table align-items-center table-flush dataTable" id="dt_default">
+              <thead class="thead-light">
+
+                <tr>
+                    <th width="50"></th>
+                    <th>Produit</th>
+                    <th>Tirage</th>
+                    <th>Nom</th>
+                    <th>Prénom</th>
+                    <th>E-mail</th>
+					<th>État</th>
+					<th>Actions</th>
+                </tr>
+            </thead>
+          <tbody>
+		  {% for item in gifts %}
+				  {# {{ dump(item) }} #}
+			  <tr>
+			  	<td>
+					<img height="50" src="{{ asset('uploads/' ~ item.picture )}}" alt="">  
+				</td>
+				<td>
+					{{ item.name }}
+				</td>
+				<td>
+					{{ item.lotteryName }}
+				</td>
+				<td>
+					<b>{{ item.lastname }}</b>
+				</td>
+				<td>
+					<b>{{ item.firstname }}</b>
+				</td>
+				<td>
+					{{ item.email }}
+				</td>
+				<td>
+					{{ item.is_delivered ? 'Envoyé' : 'En attente' }}
+				</td>
+				<td>
+				<a target="_blank" href="{{ path('lottery_preview_email', { id : item.id }) }}" class="btn btn-primary">
+				<i class="fas fa-envelope mr-2"></i>
+				Voir l'email</a>
+				{% if item.is_delivered == false %}
+				<a href="{{ path('lottery_validate_event', { id : item.id }) }}" class="btn btn-primary">
+				<i class="fas fa-check mr-2"></i>
+				Valider</a>
+				<a data-id="{{ item.id }}" class="btn btn-secondary editGift">Modifier</a>
+				{% endif %}
+					
+				</td>
+			  </tr>
+		  {% endfor %}
+		  </tbody>
+        </table>
+		{% if gifts|length == 0 %}
+		<div class="card p-3 m-3">
+			Aucun produit gagné pour le moment.
+		</div>
+		{% endif %}
+      </div>
+
+ </div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent()}}
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+
+
+$('.editGift').on('click', async function() {
+	var id = $(this).attr('data-id');
+	const { value: email } = await Swal.fire({
+		title: 'Changer de gagnant.e',
+		text : 'Attention, cette action est définitive',
+		input: 'email',
+		inputLabel: 'Nouvelle adresse :',
+		inputPlaceholder: 'Adresse e-mail',
+		showCloseButton: true,
+		preConfirm: (user) => {
+
+			$.post(
+				'{{ path('lottery_update_winner')}}',
+				{
+					id,email:user
+				},
+				function(res) {
+					console.log(res);
+					if (!res.success) {
+						Swal.showValidationMessage(res.message)
+					} else {
+						$.notify({
+							message: 'Le gain à bien été mis à jour',
+							icon: 'fas fa-check mr-2',
+						},{
+							type: 'success'
+						});
+						setTimeout(() => {
+							document.location.reload()
+						}, 3000);
+					}
+					
+				},
+			);
+		},
+	})
+
+	if (email) {
+	Swal.fire(`Mise à jour : ${email}`)
+	}
+
+});
+
+</script>
+
+{% endblock %}

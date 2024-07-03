@@ -1,0 +1,87 @@
+{% extends 'front/base.html.twig' %}
+
+{% block body %}
+
+<style>
+    input {
+        border-radius: 10px!important;
+        border: none!important;
+        padding: .8em 1em!important;
+    }
+</style>
+
+<div class="container-fluid flex-grow-1 flex-center animate__animated animate__fadeIn delay-3 ">
+    <div class="container confirm pt-lg-5 text-center">
+        <form novalidate id="form" class="needs-validation">
+            <div class="row mb-4">
+                <div class="col"> 
+                    <h3 class="text-uppercase text-center text-light">JE CONFIRME etre majeur pour participer au jeu :</h3>
+                </div>
+            </div>
+            <div class="row fs-4">
+                <div class="col"> 
+                    <div class="mb-3 d-flex flex-column align-items-start">
+                        <label for="day" class="form-label text-primary text-uppercase">Jour</label>
+                        <input type="text" class="form-control" id="day" placeholder="JJ" pattern="^(0?[1-9]|[12][0-9]|3[01])$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 2);" maxLength="2" required>
+                        <div class="invalid-feedback text-start fs-6 text-uppercase">
+                            Veuillez saisir un jour valide.
+                        </div>
+                    </div>
+                </div>
+                <div class="col"> 
+                    <div class="mb-3 d-flex flex-column align-items-start">
+                        <label for="month" class="form-label text-primary text-uppercase">Mois</label>
+                        <input type="text" class="form-control" id="month" pattern="^(0?[1-9]|1[0-2])$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 2);" placeholder="MM" maxlength="2" required>
+                        <div class="invalid-feedback text-start fs-6 text-uppercase">
+                            Veuillez saisir un mois valide.
+                        </div>
+                    </div>
+                </div>
+                <div class="col"> 
+                    <div class="mb-3 d-flex flex-column align-items-start">
+                        <label for="year" class="form-label text-primary text-uppercase">annee</label>
+                        <input type="text" class="form-control" id="year" pattern="^\d{4}$" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);" placeholder="AAAA" maxlength="4" required>
+                        <div class="invalid-feedback text-start fs-6 text-uppercase">
+                            Veuillez saisir une annee valide.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="error" class="invalid-feedback text-uppercase animate__animated animate__zoomIn fs-5 mt-1"></div>
+
+            <div class="row">
+                <div class="col">
+                    <button type="submit" class="btn mt-5 btn-primary custom-btn-light">Participer</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block javascripts %}
+{{ parent()}}
+<script>
+$("#form").on("submit", function() {
+    if($(this)[0].checkValidity()) {
+        const day = $("#day").val()
+        const month = $("#month").val()
+        const year = $("#year").val()
+
+        const date = new Date(`${year}-${month}-${day}`)
+        const now = new Date()
+
+        const is_major = now.getFullYear() - date.getFullYear() > 18 || (now.getFullYear() - date.getFullYear() === 18 && now.getMonth() > date.getMonth()) || (now.getFullYear() - date.getFullYear() === 18 && now.getMonth() === date.getMonth() && now.getDate() >= date.getDate())
+        if(!is_major) {
+            $("#error").html("Vous devez être majeur pour participer au jeu.")
+        } else {
+            localStorage.setItem("major", true)
+            window.location.href = "{{ path('front_home')}}"
+        }
+    }
+})
+</script>
+{% endblock %}

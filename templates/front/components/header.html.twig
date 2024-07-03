@@ -1,0 +1,42 @@
+{% set menu = [
+    {
+        name: 'Accueil',
+        slug: 'front_home'
+    },
+    {
+        name: 'Participer',
+        slug: 'front_register'
+    },
+] %}
+
+{# <div class="container-fluid bg-light header">
+    <div class="container">
+      <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">
+            <img height="40" src="{{ asset('assets/img/logo.png')}}" alt="">
+          </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="fas fa-bars"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              {% for page in menu %}
+                <li class="nav-item">
+                    <a class="nav-link {{ currentPage == page.slug ? 'active' : '' }}" aria-current="page" href="{{ path(page.slug) }}">{{ page.name }}</a>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </div>
+</div> #}
+
+<div class="container-fluid align-items-center">
+  <div class="row align-items-center pt-4">
+    <div class="col text-center">
+      <img class=" h-auto" src="{{ asset('assets/img/logo.png')}}" alt="">
+    </div>
+  </div>
+</div>

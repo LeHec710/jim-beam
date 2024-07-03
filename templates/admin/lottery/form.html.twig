@@ -1,0 +1,145 @@
+
+{% if form.vars.value.id is not null %}
+    {% set page_name = 'Modification du tirage :  '~form.vars.value.name %}
+{% else %}
+    {% set page_name = 'Nouveau tirage au sort' %}
+{% endif %}
+
+
+{{ form_start(form, {'attr': {'novalidate': 'novalidate','class': 'needs-validation', 'autocomplete': 'off'}}) }}
+
+    <div class="card bg-secondary shadow">
+
+        <div class="card-header border-0">
+            <div class='row align-items-center'>
+                <div class="col">
+                    <h3 class="mb-0">{{page_name}}</h3>
+                </div>
+                    <div class="col text-right">
+                              <button class="btn btn-icon btn-success" type='submit' data-toggle="tooltip" data-animation="false" title="" data-original-title="Enregistrer le formulaire">
+                                <i class="fa fa-save mr-2"></i>
+                                Enregistrer
+                            </button>
+
+                        {% if form.vars.value.id is not null %}
+
+                              <a href="javascript:void(0);" class="btn btn-danger confirmDeleteBox" data-message="Souhaitez-vous supprimer définitivement cet utilisateur ?<br/> Toutes les données rattachées à cet utilisateur seront automatiquement supprimées." data-token="{{ csrf_token('delete'~form.vars.value.id) }}" data-url="{{ path('user_delete', {'id': form.vars.value.id}) }}" >
+                                  <i class="fa fa-trash mr-2"></i> 
+                                  Supprimer
+                             </a>
+                        {% endif %}
+                    </div>
+            </div>
+        </div>
+
+      <div class="card-body">
+        <h6 class="heading-small text-muted mb-4">Informations générales</h6>
+        
+         <div class="row">
+            <div class="col-md-6">
+                  {{ form_widget(form.name) }}
+                  {# <span class="{{ item.id == null ? 'd-none' : '' }}">
+                  {{ form_widget(form.token) }}
+                  </span> #}
+                  
+            </div>
+            {# <div class="col-lg-6">
+                <label for="" class="form-control-label">Icone</label>
+                  {{ form_widget(form.picture) }}
+                <img class="card p-1" height="100" src="{{ asset('uploads/' ~ form.vars.value.icon ) }}" alt="">
+            </div> #}
+            <div class="col-md-6">
+                  {{ form_widget(form.startAt) }}
+            </div>
+            <div class="col-md-6">
+                  {{ form_widget(form.endAt) }}
+            </div>
+        </div>
+
+        {% if item.id != null and project_type != 'register' %}
+
+        <div class="card p-3">
+            <label for="" class="form-control-label">Gestion des gains</label>
+            <table class="table">
+                    <thead>
+                        <tr>
+                                <th>Image</th>
+                                <th>Nom</th>
+                                <th>Valeur</th>
+                                <th>Quantité</th>
+                                <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% if item.products|length > 0 %}
+                        {% for product in item.products %}
+                            <tr>
+                                <td>
+                                    <img src="{{ asset('uploads/' ~ product.picture )}}" class="card p-1 m-0" height="50" alt="">
+                                </td>
+                                <td>{{ product.name }}</td>
+                                <td>{{ product.price }}€</td>
+                                <td>{{ product.quantity }}</td>
+                                <td>
+                                    <a data-url="{{ path('product_form', { lotteryId : item.id, id : product.id}) }}" class="btn btn-sm btn-secondary editItem">
+                                    <i class="mr-2 fa fa-edit"></i>Modifier
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <p>Aucun produit à gagner.</p>
+                    {% endif %}
+                        
+                    </tbody>
+            </table>
+            <a data-url="{{ path('product_form', { lotteryId : item.id }) }}" class="btn editItem btn-white mt-3">
+                  <i class="fa fa-plus mr-2"></i>
+                  Ajouter un produit</a>
+        </div>
+
+        {% if project_type == 'instant_win' %}
+        <h6 class="heading-small text-muted mb-4">Génération des instants gagnants</h6>
+        <div class="row">
+            <div class="col-lg-4">
+                  <p>Exclure les jours : <b>Dimanche</b></p>
+                  <p>Heure de début : <b>10:00</b></p>
+                  <p>Heure de fin : <b>20:00</b></p>
+            </div>
+            <div class="col-lg-4">
+
+                <a href="{{ path('lottery_planning', { id : item.id }) }}" class="btn mb-3 btn-white w-100">
+                    <i class="fa fa-calendar mr-2"></i>
+                  Calendrier des IGs</a>
+                  <br>
+                  <a href="{{ path('export_igs') }}" class="btn btn-white w-100">
+                    <i class="fa fa-download mr-2"></i>
+                  Exporter les IGs</a>
+            </div>
+            <div class="col-lg-4">
+                    <label for="" class="form-control-label">Total des IGs : <b class="igCount">{{ item.gifts|length }}</b></label>
+                  <a onclick="javascript:generateIG({{item.id}})" class="btn w-100 btn-dark">Générer les IGs</a>
+                  <p><small>Attention, cette action va écraser tous les IGs existants de ce tirage. Cette action est définitive.</small></p>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% endif %}
+      </div>
+
+      <div class="card-footer">
+          <button class="btn btn-icon btn-success" type='submit' >
+                <i class="fa fa-save mr-2"></i>
+                <span class="btn-inner--text">Enregistrer</span>
+            </button>
+
+          <a class="btn btn-icon closeModal" data-dismiss="modal">
+                <i class="fa fa-arrow-left mr-2"></i>
+                <span class="btn-inner--text">Retour</span>
+            </a>
+
+      </div>
+
+    </div>
+
+    {{ form_end(form) }}

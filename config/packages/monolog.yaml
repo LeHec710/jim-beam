@@ -1,0 +1,19 @@
+monolog:
+    handlers:
+        mail_admin:
+            type:         fingers_crossed
+            action_level: critical # ou 'error' pour capturer également les erreurs non critiques
+            handler:      deduplicated
+
+        deduplicated:
+            type:    deduplication
+            handler: symfony_mailer
+
+        symfony_mailer:
+            type:       symfony_mailer
+            from_email: nepasrepondre@jeux-animalis.fr
+            to_email:   jeremy.c@limeo.com
+            subject:    "Jeux Animalis - Une erreur critique est survenue"
+            level:      critical # ou 'error'
+            formatter:  monolog.formatter.html
+            content_type: text/html

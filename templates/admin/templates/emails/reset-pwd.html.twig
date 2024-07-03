@@ -1,0 +1,18 @@
+{% extends 'admin/templates/emails/base.html.twig' %}
+
+{% block title %}
+     Bonjour {{ user.firstname }} !
+{% endblock %}
+{% block content %}
+    Vous pouvez (ré)initialiser votre mot de passe en cliquant sur le lien ci-dessous :<br/>
+
+<div class="button-container" align="center" style="padding-top:15px;padding-right:10px;padding-bottom:0px;padding-left:10px;">
+    <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-spacing: 0; border-collapse: collapse; mso-table-lspace:0pt; mso-table-rspace:0pt;"><tr><td style="padding-top: 15px; padding-right: 10px; padding-bottom: 0px; padding-left: 10px" align="center"><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="" style="height:46.5pt; width:176.25pt; v-text-anchor:middle;" arcsize="97%" stroke="false" fillcolor="#0099ce"><w:anchorlock/><v:textbox inset="0,0,0,0"><center style="color:#ffffff; font-family:Tahoma, sans-serif; font-size:16px"><![endif]-->
+    <a href="{{url}}" style="text-decoration:none;display:inline-block;color:#ffffff;background-color:#0099ce;border-radius:60px;-webkit-border-radius:60px;-moz-border-radius:60px;width:auto; width:auto;;border-top:1px solid #0099ce;border-right:1px solid #0099ce;border-bottom:1px solid #0099ce;border-left:1px solid #0099ce;padding-top:15px;padding-bottom:15px;font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;text-align:center;mso-border-alt:none;word-break:keep-all;"><span style="padding-left:30px;padding-right:30px;font-size:16px;display:inline-block;"><span style="font-size: 16px; margin: 0; line-height: 2; word-break: break-word; mso-line-height-alt: 32px;">
+                <strong>Mettre à jour mon mot de passe</strong></span></span></a>
+    <!--[if mso]></center></v:textbox></v:roundrect></td></tr></table><![endif]-->
+</div>
+<br/><br/><br/>
+<small>Si vous n'arrivez pas à cliquer sur le bouton, copiez/coller le lien suivant sur votre navigateur (Chrome, Firefox, Internet Explorer, etc.) : {{url}}</small>
+
+{% endblock %}

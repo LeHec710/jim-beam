@@ -1,0 +1,59 @@
+{% extends 'front/base.html.twig' %}
+{% set currentPage = 'front_quiz' %}
+{% block body %}
+
+{{ include("front/quiz/stepper.html.twig") }}
+
+<div class="container-fluid flex-grow-1 flex-center  ">
+    <div class="container text-center" style="max-width: 1000px">
+        <div class="row">
+            <div class="col"> 
+                <h3 class="text-uppercase text-center text-light">{{quiz.question}}</h3>
+            </div>
+        </div>
+        <div class="row g-3">
+            {% for answer in quiz.answers %}
+                <div class="col-12 align-items-center"> 
+                    <button class="btn custom-btn-light text-uppercase w-100 d-block mx-auto quiz-button">{{ answer }}</button>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="row quiz-answer mt-3 animate__animated delay-5" style="display: none">
+            <div class="col-auto text-start">
+                <h3 class="text-uppercase text-dark quiz-answer-title">Bravo !</h3>
+                <p class="quiz-answer-description">{{quiz.message}}</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-auto mx-auto animate__animated animate__fadeIn">
+                {% set url = step != maxStep ? path('front_quiz', {step: step + 1 ?? 1}) : path('front_register') %}
+                <a href="{{ url }}" class="btn mt-3 btn-primary custom-btn-primary next text-uppercase disabled">Suivant</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block javascripts %}
+{{ parent()}}
+
+<script>
+const right_answer = "{{ quiz.right_answer }}"
+
+$(".quiz-button").on("click", function() {
+    $(".quiz-button").removeClass("custom-btn-primary").addClass("custom-btn-light")
+    $(".quiz-button").addClass("pe-none")
+    $(this).toggleClass("custom-btn-light custom-btn-primary")
+    $(".next").removeClass("disabled")
+    
+    // $(".quiz-answer").show(300)
+    $(".quiz-answer").show(300).addClass("animate__zoomIn")
+    $(".quiz-answer-description").html("{{quiz.message}}")
+    $(".quiz-answer-title").html($(this).html() === right_answer ? "Bravo !" : "Dommage !")
+})
+</script>
+{% endblock %}

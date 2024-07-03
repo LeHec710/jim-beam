@@ -1,0 +1,35 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+parameters:
+    mailer_copyright: '%env(MAILER_COPYRIGHT)%'
+    recaptcha_public: '%env(RECAPTCHA_PUBLIC)%'
+    recaptcha_secret: '%env(RECAPTCHA_SECRET)%'
+
+    project_name: '%env(PROJECT_NAME)%'
+    project_url: '%env(PROJECT_URL)%'
+    project_customer: '%env(PROJECT_CUSTOMER)%'
+    project_copyright: '%env(PROJECT_COPYRIGHT)%'
+
+    project_color_primary: '%env(PROJECT_COLOR_PRIMARY)%'
+    project_color_secondary: '%env(PROJECT_COLOR_SECONDARY)%'
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones
